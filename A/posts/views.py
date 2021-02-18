@@ -8,5 +8,5 @@ def  all_posts(request):
 
 def post_detail(request, year, month, day, slug):
     #برای تطابق زمان های گرفته شده با زمان موجود در دیتابیس از لوک اپ ها استفاده شده
-    post = get_object_or_404(Post,created_year=year, created_month=month, created_day=day, slug=slug)
+    post = get_object_or_404(Post,created__year=year, created__month=month, created__day=day, slug=slug)
     return render(request,'posts/post_detail.html',{'post':post})
