@@ -1,9 +1,10 @@
 from django.contrib.messages.api import success
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render,get_object_or_404
 from .forms import UserLoginForm,UserRegisterForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
+from django.contrib.auth.models import User
 # Create your views here.
 
 def user_login(request):
@@ -39,3 +40,7 @@ def user_logout(request):
     logout(request)
     messages.success(request,'you loged out successfully','success')
     return redirect('posts:all_posts')
+
+def user_dashboard(request,user_id):
+    user = get_object_or_404(User,id = user_id)
+    return render(request,'account/dashboard.html',{'user':user})

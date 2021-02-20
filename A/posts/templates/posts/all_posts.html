@@ -4,15 +4,17 @@
 <div class="row">
 {% for post in posts %}
     <div class="col-4">
-        <a href="{{ post.get_absolute_url }}">
-            <div class="card">
+        <div class="card">
+            <a href="{% url 'account:dashboard' post.user.id %}">
                 <div class="card-header">{{ post.user }}</div>
+            </a>
+            <a href="{{ post.get_absolute_url }}">
                 <div class="card-body">
                     <p class="card-text">{{ post.body }}</p>
                 </div>
-                <div class="card-footer">{{ post.created|date }}</div>
-            </div>
-        </a>
+            </a>
+            <div class="card-footer">{{ post.created|date }}</div>
+        </div>
     </div>
 {% endfor %}
 </div>
