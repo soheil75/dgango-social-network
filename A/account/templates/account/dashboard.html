@@ -2,5 +2,29 @@
 
 {% block title %}{{ user.username }} Profile{% endblock %}
 {% block content %}
+    <a href="{% url 'posts:add_post' request.user.id %}">Add Post</a>
     <h3>{{ user.username }}</h3>
+    <p>{{ user.profile.bio }}</p>
+    <div class="row">
+        {% for post in posts %}
+        <div class="col-4">
+            <a href="{{ post.get_absolute_url }}">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">{{ post.created }}</p>
+                        <h5 class="card-title">{{ post.body }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-4 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">There Is No Post</h5>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 {% endblock %}

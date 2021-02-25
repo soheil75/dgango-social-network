@@ -4,7 +4,7 @@ from .forms import UserLoginForm,UserRegisterForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from django.contrib.auth.models import User
+from posts.models import Post
 # Create your views here.
 
 def user_login(request):
@@ -43,4 +43,5 @@ def user_logout(request):
 
 def user_dashboard(request,user_id):
     user = get_object_or_404(User,id = user_id)
-    return render(request,'account/dashboard.html',{'user':user})
+    posts = Post.objects.filter(user=user)
+    return render(request,'account/dashboard.html',{'user':user,'posts':posts})
