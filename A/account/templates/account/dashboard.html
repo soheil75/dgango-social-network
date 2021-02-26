@@ -2,7 +2,9 @@
 
 {% block title %}{{ user.username }} Profile{% endblock %}
 {% block content %}
-    <a href="{% url 'posts:add_post' request.user.id %}">Add Post</a>
+    {% if self_dash %}
+        <a class="btn btn-success" href="{% url 'posts:add_post' request.user.id %}">Add Post</a>
+    {% endif %}
     <h3>{{ user.username }}</h3>
     <p>{{ user.profile.bio }}</p>
     <div class="row">
