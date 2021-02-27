@@ -4,6 +4,7 @@
 {% block content %}
     {% if request.user.is_authenticated and request.user.id == post.user.id %}
         <a href="{% url 'posts:post_delete' post.user.id post.id %}" class="btn btn-danger mb-3">Delete Post</a>
+        <a href="{% url 'posts:post_edit' post.user.id post.id %}" class="btn btn-warning mb-3">Edit Post</a>
     {% endif %}
     <div class="card">
         <div class="card-header">
