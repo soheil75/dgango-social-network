@@ -4,6 +4,7 @@
 {% block content %}
     {% if self_dash %}
         <a class="btn btn-success" href="{% url 'posts:add_post' request.user.id %}">Add Post</a>
+        <a class="btn btn-success" href="{% url 'account:edit_profile' request.user.id %}">Edit Profile</a>
     {% endif %}
     <h3>{{ user.username }}</h3>
     <p>{{ user.profile.bio }}</p>
