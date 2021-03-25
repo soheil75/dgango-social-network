@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ user.username }} Profile{% endblock %}
+
+{% block js_files %}
+    <script src="{% static 'account/js/script.js' %}"></script>
+{% endblock %}
+
 {% block content %}
     {% if self_dash %}
         <a class="btn btn-success" href="{% url 'posts:add_post' request.user.id %}">Add Post</a>
@@ -8,6 +14,16 @@
     {% endif %}
     <h3>{{ user.username }}</h3>
     <p>{{ user.profile.bio }}</p>
+
+    <!--برای اینکه یوزر نتونه خودش خودش رو فالو کنه-->
+    {% if request.user.id != user.id %}
+        {% if is_following %}
+            <button type="button" data-id="{{ user.id }}" data-type="unfollow" class="btn btn-light mb-3 action-btn">Unfollow</button>
+        {% else %}
+            <button type="button" data-id="{{ user.id }}" data-type="follow" class="btn btn-primary mb-3 action-btn">Follow</button>
+        {% endif %}
+    {% endif %}
+
     <div class="row">
         {% for post in posts %}
         <div class="col-4">

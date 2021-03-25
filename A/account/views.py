@@ -4,11 +4,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from posts.models import Post
-from .models import Profile
+from .models import Profile,Relaiton
 from django.contrib.auth.decorators import login_required
 from random import randint
 from kavenegar import *
-from django import forms
+from django.http import JsonResponse
 
 
 
@@ -54,10 +54,15 @@ def user_logout(request):
 def user_dashboard(request,user_id):
     user = get_object_or_404(User,id = user_id)
     posts = Post.objects.filter(user=user)
+    is_following = False
+    relation = Relaiton.objects.filter(from_user=request.user,to_user=user)
+    if relation.exists():
+        is_following = True
+    #اینجا چک کردیم ایا رابطه ای بین من بیننده پروفایل با صاحب پروفایل وجود دارد یا نه
     self_dash = False
     if request.user.id == user_id:
         self_dash = True
-    return render(request,'account/dashboard.html',{'user':user,'posts':posts,'self_dash':self_dash})
+    return render(request,'account/dashboard.html',{'user':user,'posts':posts,'self_dash':self_dash,'is_following':is_following})
 
 @login_required
 def edit_profile(request,user_id):
@@ -108,3 +113,31 @@ def verify(request,phone,rand_num):
     else:
         form = VerifyCodeForm()
     return render(request,'account/verify.html',{'form':form})
+
+@login_required
+def follow(request):
+    if request.method =='POST':
+        user_id = request.POST['user-id']
+        following = get_object_or_404(User,pk=user_id)
+        check_relation = Relaiton.objects.filter(from_user=request.user,to_user=following)
+        if check_relation.exists():
+            return JsonResponse({'status':'exists'})
+        else:
+            Relaiton(from_user=request.user,to_user=following).save()
+            return JsonResponse({'status':'ok'})
+        #چک کردیم اگر رابطه وجود داشت که هیچی و بعد باسخ دادیم به درخواست وگرنه یک رابطه ساختیم و بعد جواب دادیم
+
+@login_required
+def unfollow(request):
+    if request.method == 'POST':
+        user_id = request.POST['user-id']
+        following = get_object_or_404(User,pk=user_id)
+        check_relation = Relaiton.objects.filter(from_user=request.user,to_user=following)
+        if check_relation.exists():
+            check_relation.delete()
+            return JsonResponse({'status':'ok'})
+        else:
+            return JsonResponse({'status':'notexist'})
+
+
+
