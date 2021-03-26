@@ -83,6 +83,7 @@ def phone_login(request):
     if request.method == 'POST':
         form = PhoneLoginFrom(request.POST)
         if form.is_valid():
+            global phone,rand_num
             #خود جنگو صفر اول عدد وارد شده رو حذف میکند و ما در اینجا دوباره اضافش کردیم
             phone = f"0{form.cleaned_data['phone']}"
             rand_num = randint(1000,9999)
@@ -90,12 +91,14 @@ def phone_login(request):
             api = KavenegarAPI('4E50376B5A745152496B50503749416D445A4E4771686B794C59414F6C784163746436366C4663593874383D')
             params = { 'sender' : '', 'receptor': phone, 'message' :rand_num }
             api.sms_send(params)
-            return redirect('account:verify',phone,rand_num)
+            return redirect('account:verify')
     else:
         form = PhoneLoginFrom()
     return render(request,'account/phone_login.html',{'form':form})
 
-def verify(request,phone,rand_num):
+#این روش برای لاگین و وریفای کمی مشکل داره و احتمال تداخل بین چند لاگین همزمان وجود دارد
+#یک مدل بسازید و کدی که برای کاربر ارسال میکنید رو داخل اون مدل ذخیره کنید. اینجوری میتونید برای کد ارسالی تاریخ انقضا هم بزارید.
+def verify(request):
     if request.method == "POST":
         form = VerifyCodeForm(request.POST)
         if form.is_valid():

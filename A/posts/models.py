@@ -14,6 +14,20 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('posts:post_detail', args=[self.created.year, self.created.month, self.created.day, self.slug])
+    
+    #model method
+    #تعداد لایک های پستی که در حال نمایش است رو به دست می اورد
+    def like_count(self):
+        return self.pvote.count()
+
+    def user_can_like(self,user):
+        #یک رابطه به مدل vote ایجاد کردیم و لایک های یوزر رو به دست اوردیم
+        user_like = user.uvote.all()
+        qs = user_like.filter(post=self)
+        if qs.exists():
+            return True
+        return False
+        #لایک های مربوط به پست رو از بین لایک های کاربر به دست اوردیم اگر لایک کرده بود ترو وگرنه فالس برمیگردانیم
 
 
 class Comment(models.Model):
@@ -29,3 +43,9 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-created',)
+
+class Vote(models.Model):
+    post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name='pvote')
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='uvote')
+    def __str__(self):
+        return f'{self.user} liked {self.post.slug}'

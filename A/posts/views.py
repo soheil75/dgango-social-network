@@ -1,7 +1,7 @@
 from django import forms
 from django.http import request
 from django.shortcuts import redirect, render,get_object_or_404
-from .models import Post ,Comment
+from .models import Post ,Comment,Vote
 from .forms import AddPostForm,EditPostForm,AddCommentForm,AddReplyForm
 from django.contrib import messages
 from django.utils.text import slugify
@@ -18,6 +18,12 @@ def post_detail(request, year, month, day, slug):
     post = get_object_or_404(Post,created__year=year, created__month=month, created__day=day, slug=slug)
     comments = Comment.objects.filter(post=post,is_reply=False)
     reply_form = AddReplyForm()
+
+    can_like = False
+    if request.user.is_authenticated:
+        if post.user_can_like(request.user):
+            can_like = True
+
     if request.method == 'POST':
         form = AddCommentForm(request.POST)
         if form.is_valid():
@@ -28,7 +34,7 @@ def post_detail(request, year, month, day, slug):
             messages.success(request,'Your comment submited')
     else:
         form = AddCommentForm()
-    return render(request,'posts/post_detail.html',{'post':post,'comments':comments,'form':form,'reply':reply_form})
+    return render(request,'posts/post_detail.html',{'post':post,'comments':comments,'form':form,'reply':reply_form,'can_like':can_like})
 
 @login_required
 def add_post(request,user_id):
@@ -89,4 +95,12 @@ def add_reply(request,post_id,comment_id):
             reply.is_reply = True
             reply.save()
             messages.success(request,'you send a reply','success')
+    return redirect('posts:post_detail',post.created.year,post.created.month,post.created.day,post.slug)
+
+@login_required
+def post_like(request,post_id):
+    post = get_object_or_404(Post,pk=post_id)
+    like = Vote(post=post,user=request.user)
+    like.save()
+    messages.success(request,'your like submited successfully','success')
     return redirect('posts:post_detail',post.created.year,post.created.month,post.created.day,post.slug)
